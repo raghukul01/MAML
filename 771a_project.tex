@@ -34,10 +34,12 @@
 
 \includepdf[page={1}]{first_page.pdf}
 
+\section{Abstract}
 
-\section*{Abstract}
+Machine learning algorithms generally require a lot of data to perform significantly well on any task.In contrast humans have this inherent ability to learn any task with limited experience.For example even a kid can recognize an object by looking at it only once.This is possible due to abilities such as shape bias. We will present a machine learning algorithm which tries to accomplish this task.
 
-Our project is on..
+This domain of machine learning is known as meta-learning.The word "Meta" is used to indicate some concept about a concept . So meta-learning is basically learning about learning.Our goal is to train a model that has the ability to learn a new task with little amount of training.We will show that our approach works well on variety of supervised learning problems such as sinusoidal curve fitting(regression) and classification of hand written letters on omniglot dataset. 
+
 
 \subsection*{Subsection (if any) Name}
 
@@ -112,6 +114,7 @@ which involved backpropogating the meta-gradient through gradient calculation in
 We have tested the MAML algorithm for Regression and Classfication problem. Now let's discuss each of these experiment in details.
 
 \subsection{Regression}
+\subsubsection{Data Set}
 We tested our model on the task of regressing from the input to output of a sine wave,
 where each task had a different amplitude and phase, where amplitude varies within $[0.1, 5.0]$ and phase varies within $[0, \pi]$. 
 Note that input and output in our problem are just $1$ dimensional. 
@@ -121,16 +124,47 @@ Datapoints are sampled uniformly from $[-5.0, 5.0]$ and the loss function is sim
 Our regressor is a neural network model which has $2$ hidden layers of $40$ hidden units, and each each containing activation function as ReLU. \\
 While training hyperparameter $\alpha = 0.01$, and our meta optimizer is Adam \cite{adam}. 
 
+\subsubsection{Experiment Protocol}
+We performed $K$ shot learning for $K = 5, 10, 20$.
+
+\subsubsection{Results}
+\textbf{Results for $K = 5$}
+\begin{table}[h!]
+\centering
+\begin{tabular}{c c c}
+\includegraphics[width=5cm]{5shot1_1.png} & \includegraphics[width=5cm]{5shot1_2.png} & \includegraphics[width=5cm]{5shot1_3.png} \\
+\includegraphics[width=5cm]{5shot5_1.png} & \includegraphics[width=5cm]{5shot5_2.png} & \includegraphics[width=5cm]{5shot5_3.png} \\
+\end{tabular}
+\end{table}
+
 \pagebreak
+\textbf{Results for $K = 10$}
+\begin{table}[h!]
+\centering
+\begin{tabular}{c c c}
+\includegraphics[width=5cm]{10shot1_1.png} & \includegraphics[width=5cm]{10shot1_2.png} & \includegraphics[width=5cm]{10shot1_3.png} \\
+\includegraphics[width=5cm]{10shot5_1.png} & \includegraphics[width=5cm]{10shot5_2.png} & \includegraphics[width=5cm]{10shot5_3.png} \\
+\end{tabular}
+\end{table}
+\begin{center}
+\includegraphics[width=13cm]{capture.png}
+\end{center}
+
+\subsection{Classification}
+\subsubsection{Data Set}
+\subsubsection{Architecture}
+\subsubsection{Experiment Protocol}
+\subsubsection{Results}
+
 ....
 
-\subsection*{Classification}
+\section{Conclusion}
 
-....
+We found that the MAML performs reasonably well on sinusoidal curve fitting and also on the ominiglot dataset .So from this we infer that it is a pretty good method for gradient based models.So we can use it for various other problems also. 
+\section{Future Work}
 
-\section*{Conclusion}
-
-....
+The model provided in the paper is simple as it works on any gradient based model.One of the possibilities could be to generalize the model we studied  to other variety of problem.We tested this method using neural networks. It would be great if we could try the method on other type of gradient based models like Kernelised ridge regression, SVMs etc. We could make multitasking initialization a standard step in reinforcement learning and deep learning.\\
+Currently the method does not scale appreciably on reinforcement learning problems.So we should focus on this area also.
 
 \subsection*{Subsection (if any) Name}
 
