@@ -120,7 +120,7 @@ Our regressor is a neural network model which has $2$ hidden layers of $40$ hidd
 While training hyperparameter $\alpha = 0.01$, and our meta optimizer is Adam \cite{adam}. 
 
 \subsubsection{Experiment Protocol}
-We performed $K$ shot learning for $K = 5, 10, 20$.
+We performed $K$ shot learning for $K = 5, 10.$.
 
 \subsubsection{Results}
 \textbf{Results for $K = 5$}
@@ -147,10 +147,20 @@ We performed $K$ shot learning for $K = 5, 10, 20$.
 
 \subsection{Classification}
 \subsubsection{Data Set}
+We tested our model on Omniglot dataset.This dataset contains 20 instances of 1623 characters from 50 different alphabets.Each egample in the dataset was drawn by different person.Ths dataset is common in Few Shot Learning.
+
+
 \subsubsection{Architecture}
+The model follows the same architecture as used by  Vinyals et al.(2016) \cite{Vinyals} which has 4 modules with a 3 × 3 convolutions and 64 filters, and then followed by batch normalization (Ioffe & Szegedy, 2015)\cite{Ioffe} and activation function as ReLU nonlinearity,and then 2 × 2 max-pooling.
+The dataset Omniglot has images which are downsampled to 28 × 28 so that the last hidden layer has dimensiona 64. The last layer is Softmax Classifier.\\
+For $5$ way step size $\alpha$ = 0.4 and for $20$ way step size $\alpha$ is 0.1.
 \subsubsection{Experiment Protocol}
+The Protocol  is proposed by  Vinyals et al.(2016) \cite{Vinyals}.It is for fast learning of N-way classification with 1 and 5 shots.It is done as follows:-\\
+We have N classes.Select K examples from each class and provide them to the model.At test time evaluate model's ability to classify new examples from each class.
+
 \subsubsection{Results}
-\textbf{$5$ Shot Learning}
+
+\textbf{$5$ way $1$ Shot Learning}
 \begin{table}[width=\paperwidth]
 \centering
 \resizebox{\textwidth}{!}{
@@ -169,7 +179,7 @@ We performed $K$ shot learning for $K = 5, 10, 20$.
 \end{table}
 
 
-\textbf{$20$ Shot Learning}
+\textbf{$20$ way $1$ Shot Learning}
 \begin{table}[width=\paperwidth]
 \centering
 \resizebox{\textwidth}{!}{
@@ -181,7 +191,7 @@ We performed $K$ shot learning for $K = 5, 10, 20$.
 \hline
 {\textbf{Standard Deviation}}  &  0.11 & 0.08 &0.07 & 0.07 & 0.07 & 0.07 & 0.07 & 0.07 & 0.07 & 0.07 & 0.07  \\
 \hline
-\textbf{Confidence Interval}                         & 0.006 & 0.006 & 0.006 & 0.0059 & 0.0059 & 0.0058 & 0.0059096827 & 0.0059 & 0.0059 & 0.0058 & 0.0058 \\
+\textbf{Confidence Interval}                         & 0.006 & 0.006 & 0.006 & 0.0059 & 0.0059 & 0.0058 & 0.0059 & 0.0059 & 0.0059 & 0.0058 & 0.0058 \\
 \hline
 \end{tabular}
 }
@@ -221,6 +231,23 @@ Jan 2018.
 Maclaurin, Dougal, Duvenaud, David, and Adams, Ryan.
 \textit{Gradient-based hyperparameter optimization through reversible learning.}
 In International Conference on Machine Learning (ICML), 2015.
+
+\bibitem{Vinyals}
+Vinyals, Oriol, Blundell, Charles, Lillicrap, Tim, Wierstra,
+Daan, et al. 
+\textit{Matching networks for one shot learning.}
+In neural Information Processing Systems (NIPS), 2016.
+
+
+\bibitem{Ioffe}
+Ioffe, Sergey and Szegedy, Christian. 
+\textit{Batch normalization:
+Accelerating deep network training by reducing internal
+covariate shift}.
+International Conference on Machine
+Learning (ICML), 2015.
+
+
 \end{thebibliography}
 
 \end{document}
