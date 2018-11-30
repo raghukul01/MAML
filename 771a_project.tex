@@ -10,7 +10,6 @@
 \lstset{language=Python, basicstyle=\normalsize\sffamily\linespread{0.8}, numbers=left, numberstyle=\small, stepnumber=1, numbersep=5pt}
 \usepackage{fancyhdr}
 \usepackage{pdfpages} 
-\fancypagestyle{note_1}{\fancyfoot[R]{\textit{* These kind of auction are sealed bid auction.}}}
 \setlength{\parindent}{0pt}
 
 \pagestyle{fancy}
@@ -19,6 +18,11 @@
 \chead{\textbf{Course Project Report}}
 \rhead{\COURSE}
 
+\usepackage{calrsfs}
+\DeclareMathAlphabet{\pazocal}{OMS}{zplm}{m}{n}
+\newcommand{\La}{\mathcal{L}}
+\newcommand{\Lb}{\pazocal{L}}
+\newcommand{\Tb}{\pazocal{T}}
 
 %==================Header details======================
 \newcommand\NAME{Bayesian Meta Learning}
@@ -26,69 +30,117 @@
 \newcommand\HWNUM{4}
 \newcommand\COURSE{CS771}
 %======================================================
-
-% available formatted sections:
-% - COMMAND LINE ENVIRONMENT: \begin{commandline} \end{commandline}
-% - FILE CONTENTS ENVIRONMENT: \begin{file}[optional filename, defaults to "File"]
-% - NUMBERED QUESTIONS ENVIRONMENT: \begin{question}[optional title]
-% - WARNING TEXT ENVIRONMENT(can also be used for note): \begin{warn}[optional title, defaults to "Warning:"]
-% - INFORMATION ENVIRONMENT(can be used to mention given details): \begin{info}[optional title, defaults to "Info:"]
-
-%===============================================================
 \begin{document}
 
 \includepdf[page={1}]{first_page.pdf}
 
 
-\section{Abstract}
+\section*{Abstract}
 
 Our project is on..
 
-\subsection{Subsection (if any) Name}
+\subsection*{Subsection (if any) Name}
 
 ....
 
 \section{Literature Review}
 
+MAML has been designed to enable fast adaptation to unseen tasks by training on statistically related tasks. The algorithm is Model-Agnostic which means that it can be used on any model trained through gradient-descent.
+
+\subsection{Problem Formulation}
+The paper presents a generic formulation applicable to tasks like regression, classification and reinforcement learning. Let $f$ denote the common model for all tasks with $\theta$ being the central parameter to be learned. It maps input $x$ to output $a$. Each Task is denoted by $$\Tb: \{{L}({x_1}, {a_1}, ... , {x_H}, {a_H}),q({x_1}),q({x_{t+1}}|{x_t,a_t}),H\}$$
+
+here L is the task specific loss function, $q(x_1)$ is the distribution of inputs, $q(x_{t+1} |x_t,a_t )$ is the transition probability for all states , and episode length is H. \\
+H is specifically for non-iid data, for example the unfolding of reinforcement learning training sample. For the supervised iid classification and regression experiments, H=1.
+
+\subsection{Algorithm}
+$p(\Tb)$ is the distribution over tasks over which we would train and test the meta-learning model. We will follow a K-Shot learning setting. First, a batch of tasks is sampled from $p(\Tb)$ and for each sample task $\Tb_i$, \textit{K} inputs are sampled from $q_i$. These sampled inputs are used to learn task specific $\theta_i$s which were initialized to the central parameter $\theta$. Then, we sample \textit{K} more inputs to evaluate that particular task with the $\theta_i$s. The sum of the loss incurred in all the tasks is used as the meta-loss function to find the optimal $\theta$. 
+
+\begin{algorithm}[H]
+	\SetAlgoLined
+	\KwIn{$p(\Tb):$ Distribution over tasks, $\alpha, \beta:$ Step size hyper parameters}
+	\KwOut{Parameters for this model} 
+	randomly initialize $\theta$ \\ 
+	\While{not done} {
+		Sample batch of tasks $\Tb_i \approx p(\Tb)$ \\ 
+		\For{all $\Tb_i$} {
+			Sample $K$ data points $D = \{ x^{(j)}, y^{(j)}\}$ from $\Tb_i$ \\  
+			Compute $\nabla_\theta \Lb_{\Tb_i}(f_\theta)$ using \textit{K} samples \\ 
+			Compute adapted parameters with gradient descent: \\ 
+			$\theta^{'}_{i} = \theta - \alpha\nabla_\theta \Lb_{\Tb_i}(f_\theta)$ \\ 
+			Sample data points $D^{'}_i = \{ x^{(j)}, y^{(j)}\}$ from $\Tb_i$ for the meta update \\ 
+		}
+		Update $\theta \leftarrow \theta - \beta \nabla_\theta \sum_{\Tb_i \approx p(\Tb)} \Lb_{\Tb_i} (f_(\theta^{'}_i))$ using each $D^{'}_i$ and $\Lb_{\Tb_i}$. 
+	}	
+	\Return{$\theta$}
+\end{algorithm}
+
+Formally, for each $\Tb_i$, we calculate $\theta_i'$ using the \textit{K} samples by the following gradient descent update.
+$$ \theta_i' = \theta - \alpha \nabla_\theta \Lb_{\Tb_i}(f_\theta) $$
+Here $\alpha$ is the step size and is a hyperparameter for the model. The meta objective is minimizing the sum of loss incurred in testing the sampled tasks against $D_i$s.
+$$ \min_\theta \sum_{\Tb_i \sim p(\Tb)}\Lb_{\Tb_i}(f_{\theta_i'}) = \sum_{\Tb_i \sim p(\Tb) }\Lb_{\Tb_i}(f_{\theta - \alpha \nabla_\theta \Lb_{\Tb_i}(f_\theta)}) $$
+Finally, we perform the meta optimization step using gradient descent for the central parameter $\theta$ on the loss function defined above. 
+$$\theta \leftarrow \theta - \beta \nabla_\theta \sum_{\Tb_i \sim p(\Tb)} \Lb_{\Tb_i} (f_{\theta^{'}_i})$$
+
+\subsection{Algorithm for supervised learning (Regression and classification)}
+To formalize in the context of meta learning, the loss function used for regression is the mean squared error loss as shown below
+$$ \Lb_{\Tb_{i}}(f_\phi) = \sum_{x^{(j)}, y^{(j) }\sim\Tb_{i}} || f_{\phi}(x^{(j)}) - y^{(j)} ||^2_2 $$
+where $\phi$ is the model parameter.
+For classification, the loss function is given as
+$$ \Lb_{\Tb_{i}}(f_\phi) = \sum_{x^{(j)}, y^{(j) }\sim\Tb_{i}} y^{(j)} \log f_{\phi}(x^{(j)}) + (1-y^{(j)}) \log (1 - f_{\phi}(x^{(j)})) $$
+
+
+\subsection*{Algorithm Review}
+
 ....
 
-\subsection{Algorithm Review}
+\subsection*{Bayesian ML}
 
 ....
 
-\subsection{Bayesian ML}
+\subsection*{Reinforcement Learning}
 
 ....
 
-\subsection{Reinforcement Learning}
-
-....
-
+\pagebreak
 \section{Experiments}
-
-....
+Most of the experiments carried out required automated differentiation through gradient update, 
+for which we used TensorFlow. 
+A signification computation was required in finding the second derivative, 
+in the meta gradient update step, 
+which involved backpropogating the meta-gradient through gradient calculation in meta gradient objective ($\theta \leftarrow \theta - \beta \nabla_\theta \sum_{T_i \approx p(T)} L_{T_i}(f_{\theta^{'}_i}) $). \\ \\
+We have tested the MAML algorithm for Regression and Classfication problem. Now let's discuss each of these experiment in details.
 
 \subsection{Regression}
+We tested our model on the task of regressing from the input to output of a sine wave,
+where each task had a different amplitude and phase, where amplitude varies within $[0.1, 5.0]$ and phase varies within $[0, \pi]$. 
+Note that input and output in our problem are just $1$ dimensional. 
+Datapoints are sampled uniformly from $[-5.0, 5.0]$ and the loss function is simply the mean sqaured error between prediction and the ground truth.
+
+\subsubsection{Architecture}
+Our regressor is a neural network model which has $2$ hidden layers of $40$ hidden units, and each each containing activation function as ReLU. \\
+While training hyperparameter $\alpha = 0.01$, and our meta optimizer is Adam \cite{adam}. 
+
+\pagebreak
+....
+
+\subsection*{Classification}
 
 ....
 
-\subsection{Classification}
+\section*{Conclusion}
 
 ....
 
-\section{Conclusion}
+\subsection*{Subsection (if any) Name}
 
 ....
 
-\subsection{Subsection (if any) Name}
+\section*{Future Work}
 
 ....
 
-\section{Future Work}
-
-....
-
-\subsection{Subsection (if any) Name}
+\subsection*{Subsection (if any) Name}
 
 ....
 
@@ -97,22 +149,25 @@ Our project is on..
 ....
 \pagebreak
 \begin{thebibliography}{9}
-
 \bibitem{maml}
 Chelsea Finn, Pieter Abbeel and Sergey Levine.
 \textit{Model-Agnostic Meta-Learning for Fast Adaptation of Deep Networks.}
-2017
+2017.
 
 \bibitem{bayesian}
 Taesup Kim, Jaesik Yoon, Ousmane Dia1, Sungwoong Kim, Yoshua Bengio and Sungjin Ahn.
 \textit{Bayesian Model-Agnostic Meta-Learning.}
-Jun 2018
+Jun 2018.
 
 \bibitem{gradient_based}
 Erin Grant, Chelsea Finn, Sergey Levine, Trevor Darrell, Thomas Griffiths.
 \textit{Recasting Gradient-based Meta-Learning as hierarchical Bayes.}
-Jan 2018
+Jan 2018.
 
-
+\bibitem{adam}
+Maclaurin, Dougal, Duvenaud, David, and Adams, Ryan.
+\textit{Gradient-based hyperparameter optimization through reversible learning.}
+In International Conference on Machine Learning (ICML), 2015.
 \end{thebibliography}
+
 \end{document}
