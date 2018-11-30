@@ -40,11 +40,6 @@ Machine learning algorithms generally require a lot of data to perform significa
 
 This domain of machine learning is known as meta-learning.The word "Meta" is used to indicate some concept about a concept . So meta-learning is basically learning about learning.Our goal is to train a model that has the ability to learn a new task with little amount of training.We will show that our approach works well on variety of supervised learning problems such as sinusoidal curve fitting(regression) and classification of hand written letters on omniglot dataset. 
 
-
-\subsection*{Subsection (if any) Name}
-
-....
-
 \section{Literature Review}
 
 MAML has been designed to enable fast adaptation to unseen tasks by training on statistically related tasks. The algorithm is Model-Agnostic which means that it can be used on any model trained through gradient-descent.
@@ -192,23 +187,11 @@ We performed $K$ shot learning for $K = 5, 10, 20$.
 }
 \end{table}
 
-....
+\section{Conclusion and Future Work}
 
-\section{Conclusion}
-
-We found that the MAML performs reasonably well on sinusoidal curve fitting and also on the ominiglot dataset .So from this we infer that it is a pretty good method for gradient based models.So we can use it for various other problems also. 
-\section{Future Work}
-
-The model provided in the paper is simple as it works on any gradient based model.One of the possibilities could be to generalize the model we studied  to other variety of problem.We tested this method using neural networks. It would be great if we could try the method on other type of gradient based models like Kernelised ridge regression, SVMs etc. We could make multitasking initialization a standard step in reinforcement learning and deep learning.\\
+We found that the MAML performs reasonably well on sinusoidal curve fitting and also on the ominiglot dataset .So from this we infer that it is a pretty good method for gradient based models.So we can use it for various other problems also.\\
+The model provided in the paper is simple as it works on any gradient based model.One of the possibilities could be to generalize the model we studied  to other variety of problems.We tested this method using neural networks , it would be great if we could try the method on other type of gradient based models like Kernelised ridge regression, SVMs etc. More work could be done so that multi-task initialization becomes a standard step in reinforcement learning and deep learning.
 Currently the method does not scale appreciably on reinforcement learning problems.So we should focus on this area also.
-
-\subsection*{Subsection (if any) Name}
-
-....
-
-\section*{Future Work}
-
-....
 
 \subsection*{Subsection (if any) Name}
 
